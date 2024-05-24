@@ -25,9 +25,11 @@ async function main() {
   const Note = mongoose.model("Note",noteSchema)
 
 // API routes
+
 app.get("/",(req,res)=>{
   res.send("This is a Notes App")
 })
+
 //GET Route
 app.get('/api/notes',(req, res) => {
     try {
