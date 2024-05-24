@@ -16,20 +16,17 @@ main().catch(err => console.log(err));
 async function main() {
   await mongoose.connect(MongoDB_Atlas);
 
-  //Define Note Schema and Mode
+  //Defining Note Schema and Model
   const noteSchema= new mongoose.Schema({
     title:String,
     content:String
   })
-
   const Note = mongoose.model("Note",noteSchema)
 
 // API routes
-
 app.get("/",(req,res)=>{
-  res.send("This is a Notes App")
+  res.send("<h1>Welcome To Notesworthy...</h1>")
 })
-
 //GET Route
 app.get('/api/notes',(req, res) => {
     try {
@@ -57,26 +54,26 @@ app.get('/api/notes',(req, res) => {
     }
   });
 
-//PUT ROUTE
-app.put('/api/notes/:id', async (req, res) => {
-  const { title, content } = req.body;
-  try {
-    const note = await Note.findByIdAndUpdate(req.params.id, { title, content }, { new: true });
-    res.json(note);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Server Error' });
-  }
-});
-
 //PATCH Route
 app.patch('/api/notes/:id',async (req,res)=>{
   let noteID=req.params.id
+  let noteTitle=req.body.title
   let noteContent=req.body.content
   try{
-    Note.updateOne({_id:noteID},{content:noteContent}).then(results=>{
+    if(noteTitle===""){
+    Note.updateOne({_id:noteID},{content:noteContent}).then(r=>{
+      res.json({message:"Note Content Modified Successfully"})
+    }).catch(err=>console.log(err))
+  }else if(noteContent===""){
+    Note.updateOne({_id:noteID},{title:noteTitle}).then(rs=>{
+      res.json({message:"Note Title Updated Successfully"})
+    }).catch(err=>console.log(err))
+  }
+  else{
+    Note.updateOne({_id:noteID},{title:noteTitle,content:noteContent}).then(rlt=>{
       res.json({message:"Note Updated Successfully"})
     }).catch(err=>console.log(err))
+  }
   }catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Server Error' });
@@ -93,9 +90,7 @@ app.delete('/api/notes/:id',async(req,res)=>{
     res.status(500).json({ message: 'Server Error' });
   }
 })
-  // Add other CRUD routes (PUT, DELETE) as needed
-
-  //End of DB Connection
+//End of DB Connection
 }
-//server App is Listening on port 8080
+//server App is Listening on PORT
 app.listen(Port, () => console.log(`Server running on port ${Port}`));
